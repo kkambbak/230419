@@ -5,23 +5,32 @@ import java.util.Arrays;
 public class MyArrayList<T> {
     private T[] array;
     private int size;
+    private int max = 10;
 
     public MyArrayList() {
         this.size = 0;
-        this.array = (T[]) new Object[0];
+        this.array = (T[]) new Object[max];
     }
 
     public MyArrayList(T[] array) {
         this.array = array;
     }
 
-    public boolean add(T element) {
-        Object[] newArray = new Object[size + 1];
+    private void expand() {
+        Object[] newArray = new Object[size * 2];
         for (int i = 0; i < size; i++) {
             newArray[i] = array[i];
         }
-        newArray[size] = element;
         this.array = (T[]) newArray;
+        this.max*=2;
+    }
+
+
+    public boolean add(T element) {
+        if (size+1 > max) {
+            expand();
+        }
+        array[size] = element;
         this.size++;
         return true;
     }
@@ -35,18 +44,11 @@ public class MyArrayList<T> {
     }
 
     public T remove(int i) {
-        Object[] newArray = new Object[size - 1];
-
-        for (int j = 0; j < i; j++) {
-            newArray[j] = array[j];
-        }
-
         T temp = array[i];
-
         for (int j = i; j < size - 1; j++) {
-            newArray[j] = array[j + 1];
+            array[j] = array[j + 1];
         }
-        this.array = (T[]) newArray;
+        array[size] = null;
         size--;
         return temp;
     }
@@ -71,7 +73,7 @@ public class MyArrayList<T> {
     }
 
     public void clear() {
-        this.array = (T[]) new Object[0];
+        this.array = (T[]) new Object[max];
         this.size = 0;
     }
 
