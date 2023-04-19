@@ -14,6 +14,8 @@ public class MyArrayList<T> {
 
     public MyArrayList(T[] array) {
         this.array = array;
+        this.max = array.length;
+        this.size = max;
     }
 
     private void expand() {
