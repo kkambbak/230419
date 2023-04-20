@@ -77,4 +77,17 @@ class MyHashMapTest {
         assertTrue(map.isEmpty());
     }
 
+    @Test
+    void testResize() {
+        for (int i = 1; i < 99; i++) {
+            map.put("Key000" + i, i);
+        }
+
+        for (int i = 1; i < 99; i++) {
+            assertEquals(i,map.get("Key000"+i));
+        }
+
+        assertEquals(98, map.size());
+    }
+
 }

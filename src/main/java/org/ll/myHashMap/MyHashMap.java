@@ -11,10 +11,12 @@ public class MyHashMap<K, V> {
     static class Node<K, V> {
         final K key;
         V value;
+        Node<K, V> next;
 
-        Node(K key, V value) {
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
 
         public final K getKey() {
@@ -46,7 +48,15 @@ public class MyHashMap<K, V> {
     private void resize() {
         Node<K, V>[] oldTable = table;
         max *= 2;
-        Node<K, V>[] newTable = Arrays.copyOf(oldTable, max);
+        size = 0;
+        this.table = new Node[max];
+
+        for (Node<K, V> node : oldTable) {
+            while (node != null) {
+                put(node.key, node.value);
+                node = node.next;
+            }
+        }
     }
 
 
@@ -55,26 +65,45 @@ public class MyHashMap<K, V> {
     }
 
     public V put(K key, V value) {
-        if (size >= max - 1)
+        if (size > max * 0.75)
             resize();
 
         int hash = hash(key);
 
         if (table[hash] == null) {
-            Node<K, V> newNode = new Node<>(key, value);
+            Node<K, V> newNode = new Node<>(key, value, null);
             table[hash] = newNode;
             size++;
             return null;
-        } else {
-            V oldValue = table[hash].getValue();
-            table[hash].setValue(value);
-            return oldValue;
+        }
+        else {
+            Node<K, V> node = table[hash];
+            while (node != null) {
+                if (node.getKey().equals(key)) {
+                    V oldValue = node.getValue();
+                    node.setValue(value);
+                    return oldValue;
+                }
+                node = node.next;
+            }
+            table[hash] = new Node<>(key, value, table[hash]);
+            size++;
+            return value;
+
         }
     }
 
     public V get(K key) {
         int hash = hash(key);
-        return table[hash].getValue();
+        Node<K, V> node = table[hash];
+
+        while (node.next!=null) {
+            if(node.getKey().equals(key)){
+                return node.getValue();
+            }
+            node = node.next;
+        }
+        return node.getValue();
     }
 
     public V remove(K key) {
@@ -83,7 +112,15 @@ public class MyHashMap<K, V> {
             return null;
         } else {
             V oldValue = table[hash].getValue();
-            table[hash] = null;
+
+            if (table[hash].getKey().equals(key)) {
+                if (table[hash].next != null) {
+                    table[hash] = table[hash].next;
+                } else {
+                    table[hash] = null;
+                }
+            }
+
             size--;
             return oldValue;
         }
